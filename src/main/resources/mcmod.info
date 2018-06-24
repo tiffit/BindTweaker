@@ -1,0 +1,16 @@
+[
+{
+  "modid": "bindtweaker",
+  "name": "Bind Tweaker",
+  "description": "A CraftTweaker Addon with the goal of fixing keybind conflicts.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Tiffit"],
+  "credits": "Tiffit",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": ["crafttweaker"]
+}
+]
