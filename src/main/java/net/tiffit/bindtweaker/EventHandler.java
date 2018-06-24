@@ -32,7 +32,6 @@ public class EventHandler {
 		for(KeyBinding bind : BINDING_CHECK.keySet()){
 			KeyBindWrapper wrap = KeyBindWrapper.wrap(bind);
 			if(!wrap.isChild() && checkBind(bind, null)){
-				System.out.println(wrap.children + " " + bind.getKeyDescription());
 				for(KeyBindWrapper child : wrap.children)checkBind(child.bind, bind);
 			}
 		}
@@ -46,7 +45,9 @@ public class EventHandler {
 			bind.pressTime++;
 			if(BIND_MAP.lookupActive(bind.getKeyCode()) == bind)bind.pressTime--;
 		}
-		else bind.pressTime--;
+		else{
+			bind.unpressKey();
+		}
 		return pass;
 	}
 	

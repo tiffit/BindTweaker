@@ -2,7 +2,6 @@ package net.tiffit.bindtweaker.api.server;
 
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.player.IPlayer;
-import net.tiffit.bindtweaker.api.KeyBindWrapper;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
