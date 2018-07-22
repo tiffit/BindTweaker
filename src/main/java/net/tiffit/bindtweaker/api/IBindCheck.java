@@ -49,6 +49,8 @@ public interface IBindCheck {
 			return new MCPlayer(Minecraft.getMinecraft().player);
 		}
 		
+		
+		
 	}
 	
 }

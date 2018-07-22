@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
+import net.tiffit.bindtweaker.api.APIHub;
 import net.tiffit.bindtweaker.api.IBindCheck;
 import net.tiffit.bindtweaker.api.IBindCheck.CheckEvent;
 import net.tiffit.bindtweaker.api.KeyBindWrapper;
@@ -23,6 +24,7 @@ public class EventHandler {
 
 	public static HashMap<KeyBinding, IBindCheck> BINDING_CHECK = new HashMap<KeyBinding, IBindCheck>();
 	private static KeyBindingMap BIND_MAP = null;
+	public static KeyBinding forceNext = null;
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void handleKeys(KeyInputEvent e) {
@@ -41,17 +43,25 @@ public class EventHandler {
 		if((parent != null && !isActive(parent)) || (parent == null && !isActive(bind)))return false;
 		IBindCheck check = BINDING_CHECK.get(bind);
 		boolean pass = check.canRun(new CheckEvent(bind));
-		if(pass){
-			bind.pressTime++;
-			if(BIND_MAP.lookupActive(bind.getKeyCode()) == bind)bind.pressTime--;
-		}
-		else{
-			bind.unpressKey();
-		}
+		if(forceNext == bind)pass = true;
+		if(pass)pressKey(bind); //press key if passes check
+		else bind.unpressKey(); //make sure it is not pressed if it didn't
+		forceNext = null;
 		return pass;
 	}
 	
+	public static void pressKey(KeyBinding bind){
+		bind.pressTime++;
+		if(BIND_MAP.lookupActive(bind.getKeyCode()) == bind && forceNext != bind)bind.pressTime--;
+		KeyBindWrapper wrapper = KeyBindWrapper.wrap(bind);
+		if(wrapper.bindmenu != null){
+			APIHub.openBindMenu(wrapper.bindmenu, wrapper.bindmenuUseBindChecks);
+		}
+		//System.out.println(bind.getKeyDescription() + " : " + (BIND_MAP.lookupActive(bind.getKeyCode()) == bind));
+	}
+	
 	private static boolean isActive(KeyBinding bind){
+		if(forceNext == bind)return true;
 		int code = bind.getKeyCode();
 		KeyBinding active = BIND_MAP.lookupActive(code);
 		List<KeyBinding> REMOVED = new ArrayList<KeyBinding>();

@@ -1,5 +1,10 @@
 package net.tiffit.bindtweaker.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +21,7 @@ import net.tiffit.bindtweaker.api.IBindCheck.CheckEvent;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenGetter;
 import stanhebben.zenscript.annotations.ZenMethod;
+import stanhebben.zenscript.annotations.ZenProperty;
 
 @ZenClass(value = "mod.bt.Keybind")
 public class KeyBindWrapper{
@@ -27,6 +33,11 @@ public class KeyBindWrapper{
 	public KeyBinding bind;
 	private boolean child = false;
 	public List<KeyBindWrapper> children = new ArrayList<KeyBindWrapper>();
+	
+	@ZenProperty
+	public String bindmenu;
+	@ZenProperty
+	public boolean bindmenuUseBindChecks = false;
 	
 	private KeyBindWrapper(KeyBinding bind){
 		this.bind = bind;
@@ -64,6 +75,25 @@ public class KeyBindWrapper{
 		KEYBIND_ARRAY.remove(bind.bind.getKeyDescription(), bind.bind);
 		KeyBinding.resetKeyBindingArrayAndHash();
 		bind.child = true;
+	}
+	
+	@ZenMethod
+	public KeyBindWrapper withDisable(){
+		try {
+			Path p = new File(Minecraft.getMinecraft().mcDataDir, "options.txt").toPath();
+			List<String> lines = Files.readAllLines(p, StandardCharsets.UTF_8);
+			for(int i = 0; i < lines.size(); i++){
+				String line = lines.get(i);
+				String[] split = line.split(":");
+				if(split.length == 2 && split[0].equals("key_" + bind.getKeyDescription())){
+					lines.set(i, split[0] + ":0");
+				}
+			}
+			Files.write(p, lines);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return this;
 	}
 	
 	@ZenMethod
